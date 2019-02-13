@@ -188,7 +188,7 @@ source: [https://developer.apple.com/documentation/uikit/uiview/1622585-ishidden
 
 ### What about `alpha`?
 
-As I have already mentioned, the differences are:
+As I have already mentioned at the beginning, the differences are:
 
 - `alpha` can be animated
 - `alpha` has intermediate states, for example, we can set `alpha` to `0.7` (70%), contrary, `isHidden` is binary, it can be either `true` (hidden) or `false` (visible)
