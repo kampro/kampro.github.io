@@ -27,7 +27,7 @@ override func viewDidLoad() {
 }
 {% endhighlight %}
 
-`setUpViews` doesn't do nothing special, it just sets colours, adds views as subviews and pins constraints:
+`setUpViews` does nothing special, it just sets colours, adds views as subviews and pins constraints:
 
 {% highlight swift %}
 private func setUpViews() {
