@@ -166,7 +166,7 @@ button:
 	size: (120.0, 30.0)
 ```
 
-Maybe in the runtime, it acts differently, I removed `redRectangle.isHidden = true` from `setUpViews` and implemented `didTapHideViewButton` selector of the button as follows
+Maybe in the runtime it acts differently, I removed `redRectangle.isHidden = true` from `setUpViews` and implemented `didTapHideViewButton` selector of the button as follows
 
 {% highlight swift %}
 @objc func didTapHideViewButton(_ sender: Any) {
