@@ -200,7 +200,7 @@ So, if you know CSS, `isHidden` acts exactly the same way as `visibility` in CSS
 
 In 2015, along with Apple Watch, Apple introduced a concept of container view which can arrange its subviews in stacks automatically, that was the only approach to building UI in watchOS, later on, iOS 9 got this container known as `UIStackView`. The documentation says
 
->Stack views let you leverage the power of Auto Layout, creating user interfaces that can dynamically adapt to the device’s orientation, screen size, and any changes in the available space. The stack view manages the layout of all the views in its arrangedSubviews property. These views are arranged along the stack view’s axis, based on their order in the arrangedSubviews array.
+> Stack views let you leverage the power of Auto Layout, creating user interfaces that can dynamically adapt to the device’s orientation, screen size, and any changes in the available space. The stack view manages the layout of all the views in its arrangedSubviews property. These views are arranged along the stack view’s axis, based on their order in the arrangedSubviews array.
 
 source: [https://developer.apple.com/documentation/uikit/uistackview](https://developer.apple.com/documentation/uikit/uistackview)
 
