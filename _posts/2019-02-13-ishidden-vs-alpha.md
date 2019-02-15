@@ -1,6 +1,6 @@
 ---
 title: "UIView's isHidden vs alpha property"
-category: swift
+categories: [swift, ios]
 ---
 At the beginning a short story. Some time ago a friend of mine asked me to took part in a recruitment in a company which he has worked in. So I sent a CV and after a couple of days, I set a meeting with a recruiter and an iOS team. The first part of the meeting was a talk with the recruiter, it was like usual talks of this type &#x1F642;. After this short first part, there was the second part - a talk with the iOS team. After several minutes of the conversation, I knew that I didn't want to work in this company, a developer with "lead" title (with a short experience) was incompetent and arrogant, after that observation, my answers mainly sounded "mmm... I have heard something, but I have no idea what it is", there was no sense to debate. Generally, the developers were trying to mark their position and discredit me, however, they were wrong in many situations.  
 One of the first questions was the question about the difference between `isHidden` and `alpha` property of `UIView`, it was quite trivial so I felt a little bit confused. I started talking and I said that `alpha` is "animatable" so we can animate it and maybe when `isHidden` is set to `true` a rendering engine does optimizations but the outcome is the same as `alpha` equal to `0`. I had no idea what I could say more. And then I heard
@@ -91,7 +91,7 @@ myView.addSubview(mySubview)
 mySubview.topAnchor.constraint(equalTo: myView.topAnchor, constant: 16).isActive = true
 mySubview.rightAnchor.constraint(equalTo: myView.rightAnchor, constant: -16)
 mySubview.leftAnchor.constraint(equalTo: myView.leftAnchor, constant: 16).isActive = true
-mySubview.bottomAnchor.constraint(equalTo: myView.bottonAnchor, constant: -16).isActive = true
+mySubview.bottomAnchor.constraint(equalTo: myView.bottomAnchor, constant: -16).isActive = true
 {% endhighlight %}
 
 Now we should be sure, that our code works perfectly! As the iOS developer suggested, we even don't have to test it, because if we forget about something, we will get an error. But wait... We forgot about `.isActive = true` in the third line &#x1F642;. Everything compiles, we don't get any errors but our app doesn't work as we expect, because we forgot the tiny piece of code...
