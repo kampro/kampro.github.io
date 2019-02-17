@@ -2,7 +2,7 @@
 title: "Swift's guard construction"
 category: swift
 ---
-Today I would like to describe a simple construction introduced in Swift 2.0 - `guard`. I know that this can be valuable for very fresh Swift developers only, but I have to be sure that everything what will be used in the future posts has been explained.
+Today I would like to describe a simple construction introduced in Swift 2.0 - `guard`. I know that this can be valuable for very fresh Swift developers only, but I have to be sure that everything that will be used in the future posts has been explained.
 
 ### What is the purpose of `guard`?
 
@@ -41,7 +41,7 @@ class SomeClass {
 }
 {% endhighlight %}
 
-As we can see, we have a stub of the indentation hell, this is the place where `guard` helps. Using `guard` we can write it like this
+As we can see, we have a stub of the indentation hell, this is the place, where `guard` helps. Using `guard`, we can write it like this
 
 {% highlight swift %}
 class SomeClass {
@@ -63,7 +63,7 @@ class SomeClass {
         let fileURL = directory.appendingPathComponent(filePath)
         
         do {
-            guard try fileURL.checkResourceIsReachable() else {
+            if try fileURL.checkResourceIsReachable() {
                 print("File exists")
                 return
             }
@@ -79,7 +79,7 @@ class SomeClass {
 }
 {% endhighlight %}
 
-A lot more readable. `guard` guarantes that every check which is applied in `guard` is complied from this place to the end of the current scope, otherwise the execution has to leave the scope.
+Much more readable. `guard` guarantees that every check which is applied in `guard` is compliant from this place to the end of the current scope, the execution has to leave the scope otherwise.
 
 ### The syntax
 
@@ -89,4 +89,26 @@ guard <condition> else {
 }
 {% endhighlight %}
 
-`else` keyword is mandatory and inside of `else`'s block there must occur `return`, `break`, `continue`, `throw` or a call of a function which returns `Never` (something what would break the program's current flow).
+`else` keyword is mandatory and inside of `else`'s block, there must occur `return`, `break`, `continue`, `throw` or a call of a function which returns `Never` (something that would break the program's current flow).  
+The condition in `guard` is a statement which has to be `Bool` or bridged to `Bool`, similar to `if` statement, a couple of examples below.
+
+{% highlight swift %}
+guard let unwrapped = optionalProperty else {
+    (...)
+}
+{% endhighlight %}
+
+{% highlight swift %}
+guard myView.isHidden else {
+    (...)
+}
+{% endhighlight %}
+
+{% highlight swift %}
+guard let self = self,
+    let unwrapped = optionalProperty,
+    var unwrappedVariable = anotherOptionalProperty,
+    myView.isHidden && myArray.count > 0 else {
+    (...)
+}
+{% endhighlight %}
