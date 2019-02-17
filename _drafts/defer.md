@@ -7,7 +7,55 @@ Continuing an explanation of topics which were touched during my meeting with an
 
 ### How does `defer` work?
 
-The statement allows to execute instructions 
+The statement allows to execute instructions inside `defer` when our program leaves a scope where `defer` is. In the simple words, instructions from `defer` will be executed when a program goes out of a block (a zone between `{``}`). Let's go to the example.  
+For the purposes of the post, I made a simple class which are supposed to simulate a communication to a remote server.
+
+{% highlight swift %}
+class Connection {
+    
+    private(set) var isConnected = false
+    private(set) var hasReadPermission = false
+    
+    func connect() {
+        print("connect")
+        
+        isConnected = true
+        hasReadPermission = Bool.random()
+    }
+    
+    func disconnect() {
+        print("disconnect")
+        
+        isConnected = false
+        hasReadPermission = false
+    }
+    
+    func countFiles() -> Int {
+        return Int.random(in: 0...10)
+    }
+    
+}
+
+class ViewController: UIViewController {
+
+    (...)
+
+    private func countRemoteFiles() {
+        let connection = Connection()
+        connection.connect()
+        
+        guard connection.hasReadPermission else {
+            connection.disconnect()
+            return
+        }
+        
+        print(connection.countFiles())
+        
+        connection.disconnect()
+    }
+
+}
+{% endhighlight %}
 <!-- example without and with defer -->
 
 ### Errors inside a `defer`'s block
