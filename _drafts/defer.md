@@ -8,7 +8,7 @@ Continuing an explanation of topics which were touched during my meeting with an
 ### How does `defer` work?
 
 The statement allows to execute instructions inside `defer` when our program leaves a scope where `defer` is. In the simple words, instructions from `defer` will be executed when a program goes out of a block (a zone between `{``}`). Let's go to the example.  
-For the purposes of the post, I made a simple class which are supposed to simulate a communication to a remote server.
+For the purposes of the post, I made a simple class which is supposed to simulate a communication to a remote server.
 
 {% highlight swift %}
 class Connection {
