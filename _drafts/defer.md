@@ -7,8 +7,8 @@ Continuing an explanation of topics which were touched during my meeting with an
 
 ### How does `defer` work?
 
-The statement allows to execute instructions inside `defer` when our program leaves a scope where `defer` is. In the simple words, instructions from `defer` will be executed when a program goes out of a block (a zone between `{``}`). `defer` is used very often in companion with `guard`. Let's go to the example.  
-For the purposes of the post, I made a simple class which is supposed to simulate a communication with a remote server.
+The statement allows executing instructions inside `defer` when our program leaves a scope where `defer` is. In the simple words, instructions from `defer` will be executed when a program goes out of a block (a zone between `{``}`). `defer` is used very often in companion with `guard`. Let's go to the example.  
+For the purposes of the post, I made a simple class which is supposed to simulate communication with a remote server.
 
 {% highlight swift %}
 class Connection {
@@ -61,7 +61,7 @@ class ViewController: UIViewController {
 }
 {% endhighlight %}
 
-In this example we have a couple of ugly things, first of all, we wrote an instruction that disconnects twice, secondly, we open the connection at the begining of the method and we close it at the end, it means that we can forget about the diconnecting instruction.    
+In this example we have a couple of ugly things, first of all, we wrote an instruction that disconnects twice, secondly, we open the connection at the beginning of the method and we close it at the end, it means that we can forget about the disconnecting instruction.    
 Using `defer` we can keep this code more readable and better organised, `countRemoteFiles` might look like this
 
 {% highlight swift %}
@@ -126,7 +126,7 @@ do {
     (...)
 
     defer {
-        try connection.produceError() // Error! We `try` isn't inside `do`
+        try connection.produceError() // Error! `try` isn't inside `do`
     }
 
     (...)
@@ -138,13 +138,47 @@ do {
 
 ### Multiple `defer` statements
 
-Can we have multiple `defer` statements? Yes, we can, but we have to know how a more than one statement works exactly. If we wanted to defer several instructions, we would write them in the same block belonging to one `defer`, so what is the purpose of multiple `defer`s? The answer is: if there is a more than one `defer`, they are executed **in the reverse order** of an occurrence.
+Can we have multiple `defer` statements? Yes, we can, but we have to know how more than one statement works exactly. If we wanted to defer several instructions, we would write them in the same block belonging to one `defer`, so what is the purpose of multiple `defer`s? The answer is: if there is a more than one `defer`, they are executed **in the reverse order** of an occurrence.
 
 > If multiple defer statements appear in the same scope, the order they appear is the **reverse** of the order they are executed.
 
 source: [https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_defer-statement](https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_defer-statement)
 
-If you thought about it, you would admit that it is a logical mechanism.
-<!-- example, nested defer -->
+If you thought about it, you would admit that it is a logical mechanism. Let's suppose we have the following situation
+
+{% highlight swift %}
+do {
+    let connection = Connection()
+    connection.connect()
+    
+    defer {
+        connection.disconnect()
+        print("Disconnect") // 2
+    }
+    
+    let file = try connection.openFile(with: url)
+    
+    defer {
+        file.closeFile()
+        print("Close file") // 1
+    }
+    
+    try file.write(content: "This is a file content")
+} catch {
+    print(error.localizedDescription) // 3
+}
+{% endhighlight %}
+
+as you can see I close the connection and the file just after opening but these closings are inside of `defer`, it keeps the code less error-prone (there is always closing just after opening) and thanks to `defer`, closings will be called in the proper moment. This is logical that if we opened the connection and then opened the file, we would close the file firstly and then close the connection after we do all the operations on the file, this is how `defer` would work. If we run the code, we would get the following output
+
+```
+Close file
+Disconnect
+Couldn't write to the file
+```
+
+Firstly, our code throws an exception, then the code leaves its scope so `defer`s are fired up, the file and connection are closed respectively and then we catch the exception lastly.
+
+<!-- nested defer -->
 
 <!-- linearlity -->
