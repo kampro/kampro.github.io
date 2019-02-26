@@ -179,6 +179,83 @@ Couldn't write to the file
 
 Firstly, our code throws an exception, then the code leaves its scope so `defer`s are fired up, the file and connection are closed respectively and then we catch the exception lastly.
 
-<!-- nested defer -->
+### Nested `defer` statements
+
+If you place `defer` inside of other `defer` the same rules apply, it means that the inner `defer` is limited by the outer one, let's go to the example.
+
+{% highlight swift %}
+do {
+    let connection = Connection()
+    connection.connect()
+    
+    defer { // A
+        connection.disconnect()
+        print("Disconnect")
+    }
+    
+    let file = try connection.openFile(with: url)
+    
+    defer { // B
+        defer { // C
+            defer { // D
+                print("Nested defer")
+            }
+        }
+    }
+    
+    defer { // E
+        file.closeFile()
+        print("Close file")
+    }
+    
+    try file.write(content: "This is a file content")
+} catch {
+    print(error.localizedDescription)
+}
+{% endhighlight %}
+
+If we run the code we should get
+
+```
+Close file
+Nested defer
+Disconnect
+Couldn't write to the file
+```
+
+Going from the last `defer` to the first one, the code executes `D`, `B`, *and then, everything that is inside of `B`. In `B` there is another `defer` (`C`) which will be executed when the execution leaves the scope of `B`, this happens immediately, because `C` is the only instruction in `B`. The same situation is with `D` inside of `C`.*  
+In the summary, the `defer`s are executed in the following order `E - B-C-D - A`. We can put some `print`s to see that we are right.
+
+{% highlight swift %}
+(...)
+
+defer { // B
+    defer { // C
+        defer { // D
+            print("Nested defer")
+
+            print("D")
+        }
+
+        print("C")
+    }
+
+    print("B")
+}
+
+(...)
+{% endhighlight %}
+
+The output is
+
+```
+Close file
+B
+C
+Nested defer
+D
+Disconnect
+Couldn't write to the file
+```
 
 <!-- linearlity -->
