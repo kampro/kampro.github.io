@@ -14,7 +14,7 @@ from the iOS developer, he kept going
 Of course, he was wrong, I was arguing later on, but I thought "this is a checkmate, game over, finish... it also means that you have no experience". There were much more "glitches", at least I have topics for the next posts.  
 That circumstance was my inspiration to start this blog, so let's go to the topic.
 
-### The project
+## The project
 
 I created a very simple project which consists of one view controller that has 3 views inside the main view: two rectangles and one button.  
 This is how `viewDidLoad` looks like
@@ -178,7 +178,7 @@ Maybe in the runtime it acts differently, I removed `redRectangle.isHidden = tru
 
 ![ScreenShot](/assets/ishidden-vs-alpha-03.gif)
 
-### The documentation
+## The documentation
 
 There is nothing unexpected, the official documentation says
 
@@ -186,7 +186,7 @@ There is nothing unexpected, the official documentation says
 
 source: [https://developer.apple.com/documentation/uikit/uiview/1622585-ishidden](https://developer.apple.com/documentation/uikit/uiview/1622585-ishidden)
 
-### What about `alpha`?
+## What about `alpha`?
 
 As I have already mentioned at the beginning, the differences are:
 
@@ -196,7 +196,7 @@ As I have already mentioned at the beginning, the differences are:
 
 So, if you know CSS, `isHidden` acts exactly the same way as `visibility` in CSS.
 
-### One more thing...
+## One more thing...
 
 In 2015, along with Apple Watch, Apple introduced a concept of container view which can arrange its subviews in stacks automatically, that was the only approach to building UI in watchOS, later on, iOS 9 got this container known as `UIStackView`. The documentation says
 
