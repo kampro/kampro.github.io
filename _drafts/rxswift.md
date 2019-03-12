@@ -47,7 +47,7 @@ completed
 If you want to subscribe for events of a specific type you can use
 
 {% highlight swift %}
-subscribe(onNext: ((T) -> Void)?, onError: ((Error) -> Void)?, onCompleted: (() -> Void)?, onDisposed: (() -> Void)?)
+func subscribe(onNext: ((T) -> Void)?, onError: ((Error) -> Void)?, onCompleted: (() -> Void)?, onDisposed: (() -> Void)?) -> Disposable
 {% endhighlight %}
 
 ## Disposing subscriptions
@@ -76,14 +76,94 @@ class ViewController: UIViewController {
 }
 {% endhighlight %}
 
+## Side effects
+
+If you want to do an action based on an emitted event, you can use
+
+{% highlight swift %}
+func do(onNext: ((T) throws -> Void)?, onError: ((Error) throws -> Void)?, onCompleted: (() throws -> Void)?, onSubscribe: (() -> Void)?, onSubscribed: (() -> Void)?, onDispose: (() -> Void)?) -> Observable<T>
+{% endhighlight %}
+
+It is quite similar to the subscription but it do not register an observer, it means, that a cold `Observable` will not emit any events when you use the method until you register an observer.
+
 ## Subjects
 
-While an `Observable` has an output only (it can only emit values), an `Subject` is an `Observable` that can add new values to the squence dynamically. RxSwift has four kinds of `Subjects`
+While an `Observable` has an output only (it can only emit values), an subject is an `Observable` that can add new values to the squence dynamically. RxSwift has four kinds of subjects
 
-* `PublishSubject`
-* `BehaviourSubject`
-* `ReplaySubject`
-* `Variable`
+* `BehaviourSubject` - the subject will emit to the observers the most recent element (or an error if it is the last state of the subject) and any other elements emitted later on
+* `PublishSubject` - the subject will emit to the observers every element emitted after the observer subscribed
+* `ReplaySubject` - the subject will emit to the observers all elements which have been emitted before and after the observer subscribed
+* `Variable` - in fact, this is "sugar" for `BehaviourSubject`, this name is more understandable, at least for iOS developers
+
+Let's see how it works in action.
+
+### BehaviourSubject (Variable)
+
+{% highlight swift %}
+let subject = BehaviorSubject(value: "One")
+subject.onNext("Two")
+
+subject.subscribe(onNext: { value in
+    print(value)
+}).disposed(by: disposeBag)
+
+subject.onNext("Three")
+subject.onNext("Four")
+{% endhighlight %}
+
+Output:
+
+```
+Two
+Three
+Four
+```
+
+### PublishSubject
+
+{% highlight swift %}
+let subject = PublishSubject<String>()
+subject.onNext("One")
+subject.onNext("Two")
+
+subject.subscribe(onNext: { value in
+    print(value)
+}).disposed(by: disposeBag)
+
+subject.onNext("Three")
+subject.onNext("Four")
+{% endhighlight %}
+
+Output:
+
+```
+Three
+Four
+```
+
+### ReplaySubject
+
+{% highlight swift %}
+let subject = ReplaySubject<String>.create(bufferSize: 4)
+subject.onNext("One")
+subject.onNext("Two")
+
+subject.subscribe(onNext: { value in
+    print(value)
+}).disposed(by: disposeBag)
+
+subject.onNext("Three")
+subject.onNext("Four")
+{% endhighlight %}
+
+Output:
+
+```
+One
+Two
+Three
+Four
+```
 
 ## Traits
 
