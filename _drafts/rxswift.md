@@ -5,11 +5,11 @@ categories: [swift, ios]
 ## What is Rx?
 
 Rx stands for Reactive Extensions (aka ReactiveX), it is a set of tools which helps to write a code acording to the reactive programming pattern. Using the reactive programming we can write our code in a more declarative way and using Rx library we don't have to think about threads and all the infrastructure.  
-RxSwift is an implementation of Rx in Swift. RxCocoa is a library which adds Rx functionality to Cocoa classes and Rx types which can better cooperate with Cocoa. To start with RxSwift and RxCocoa just add the libraries ([project on GitHub](https://github.com/ReactiveX/RxSwift)) to your project and import them (`import ...`) in the file where you want to use Rx.
+*RxSwift* is an implementation of Rx in Swift. *RxCocoa* is a library which adds Rx functionality to Cocoa classes and Rx types which can better cooperate with Cocoa. To start with *RxSwift* and *RxCocoa* just add the libraries ([project on GitHub](https://github.com/ReactiveX/RxSwift)) to your project and import them (`import ...`) in the file where you want to use Rx.
 
 ## Observable sequences
 
-Almost everything in RxSwift is an observable sequence (`Observable`) and almost every Swift collection can be transformed to `Observable`.
+Almost everything in *RxSwift* is an observable sequence (`Observable`) and almost every Swift collection can be transformed to `Observable`.
 
 {% highlight swift %}
 let sequence = Observable.from([0, 1, 2, 3, 4, 5])
@@ -84,11 +84,11 @@ If you want to do an action based on an emitted event, you can use
 func do(onNext: ((T) throws -> Void)?, onError: ((Error) throws -> Void)?, onCompleted: (() throws -> Void)?, onSubscribe: (() -> Void)?, onSubscribed: (() -> Void)?, onDispose: (() -> Void)?) -> Observable<T>
 {% endhighlight %}
 
-It is quite similar to the subscription but it do not register an observer, it means, that a cold `Observable` will not emit any events when you use the method until you register an observer.
+It is quite similar to the subscription but it does not register an observer, it means, that a cold `Observable` will not emit any events when you use the method until you register an observer.
 
 ## Subjects
 
-While an `Observable` has an output only (it can only emit values), an subject is an `Observable` that can add new values to the squence dynamically. RxSwift has four kinds of subjects
+While an `Observable` has an output only (it can only emit values), an subject is an `Observable` that can add new values to the squence dynamically. *RxSwift* has four kinds of subjects
 
 * `BehaviourSubject` - the subject will emit to the observers the most recent element (or an error if it is the last state of the subject) and any other elements emitted later on
 * `PublishSubject` - the subject will emit to the observers every element emitted after the observer subscribed
@@ -167,7 +167,146 @@ Four
 
 ## Traits
 
-[traits](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md)
+Traits are wrapped `Observable`s, they indroduce more contextual meaning and syntactical sugar for specific use cases, they are fully optional and you can do the same thing usign raw `Observable`s (but with more effort). Some Traits have been introduced specifically for *RxCocoa* (i.e. `Driver`). You can always transform the Trait to the `Observable` using `asObservable()` method.
+
+## RxSwift Traits
+
+### Single
+
+* Emits exactly one element, or an error.
+* Doesn't share side effects.
+
+{% highlight swift %}
+let single = Single<String>.create { single in
+    if true {
+        single(.success("Value"))
+    } else {
+        single(.error(SimulatedError.genericError("Some error")))
+    }
+    
+    return Disposables.create {
+        print("Dispose trait's resources")
+    }
+}
+
+single.subscribe { event in
+    print(event)
+}.disposed(by: disposeBag)
+{% endhighlight %}
+
+Output:
+
+```
+success("Value")
+Dispose trait's resources
+```
+
+### Completable
+
+* Emits zero elements.
+* Emits a completion event, or an error.
+* Doesn't share side effects.
+
+{% highlight swift %}
+let completable = Completable.create { completable in
+    let didErrorOccur = true
+    
+    if didErrorOccur {
+        completable(.error(SimulatedError.genericError("Some error")))
+    } else {
+        completable(.completed)
+    }
+    
+    return Disposables.create {
+        print("Dispose trait's resources")
+    }
+}
+
+completable.subscribe { event in
+    print(event)
+}.disposed(by: disposeBag)
+{% endhighlight %}
+
+Output:
+
+```
+error(TestProject.SimulatedError.genericError("Some error"))
+Dispose trait's resources
+```
+
+### Maybe
+
+* Emits either a completed event, a single element or an error.
+* Doesn't share side effects.
+
+{% highlight swift %}
+let maybe = Maybe<String>.create { maybe in
+    let number = Int.random(in: 0...10)
+    let isEven = number % 2 == 0
+    
+    if number == 0 {
+        maybe(.error(SimulatedError.genericError("Number is 0")))
+    } else if isEven {
+        maybe(.success("Number is even"))
+    } else {
+        maybe(.completed)
+    }
+    
+    return Disposables.create {
+        print("Dispose trait's resources")
+    }
+}
+
+maybe.subscribe { event in
+    print(event)
+}.disposed(by: disposeBag)
+{% endhighlight %}
+
+Output:
+
+```
+completed
+Dispose trait's resources
+```
+
+## RxCocoa Traits
+
+### Driver
+
+`Driver` is mainly for driving the UI layer.
+
+* Can't error out.
+* Observe occurs on main scheduler.
+* Shares side effects (share(replay: 1, scope: .whileConnected)).
+
+Any observable sequence can be converted to the Driver trait, as long as it satisfies 3 properties:
+
+* Can't error out.
+* Observe on main scheduler.
+* Sharing side effects (`share(replay: 1, scope: .whileConnected)`).
+
+{% highlight swift %}
+
+{% endhighlight %}
+
+Output:
+
+```
+
+```
+
+### Signal
+
+`Signal` is quite similar to the `Driver` but it does not replay the last event when an observer subscribed.
+
+* Can't error out.
+* Delivers events on Main Scheduler.
+* Shares computational resources (share(scope: .whileConnected)).
+* Does NOT replay elements on subscription.
+
+### ControlProperty
+
+### ControlEvent
 
 ## Operators
 
