@@ -277,7 +277,26 @@ Dispose trait's resources
 
 * Can't error out.
 * Observe occurs on main scheduler.
-* Shares side effects (share(replay: 1, scope: .whileConnected)).
+* Shares side effects (`share(replay: 1, scope: .whileConnected)`).
+
+{% highlight swift %}
+let results = searchBar.rx.text.asDriver().debounce(0.3).flatMapLatest { queryString -> SharedSequence<DriverSharingStrategy, [String]> in
+    let query = queryString ?? ""
+    return self.fetch(query: query).asDriver(onErrorJustReturn: [])
+}
+
+results.map { "\($0.count)" }.drive(countLabel.rx.text).disposed(by: disposeBag)
+
+results.map { results -> String in
+    var resultsString = ""
+    
+    for item in results {
+        resultsString += "\(item)\n"
+    }
+    
+    return resultsString
+}.drive(resultsTextView.rx.text).disposed(by: disposeBag)
+{% endhighlight %}
 
 Any observable sequence can be converted to the Driver trait, as long as it satisfies 3 properties:
 
@@ -285,15 +304,12 @@ Any observable sequence can be converted to the Driver trait, as long as it sati
 * Observe on main scheduler.
 * Sharing side effects (`share(replay: 1, scope: .whileConnected)`).
 
+`asDriver(onErrorJustReturn: T)` does something like this internally
+
 {% highlight swift %}
-
+let safeSequence = sequence.observeOn(MainScheduler.instance).catchErrorJustReturn(onErrorJustReturn).share(replay: 1, scope: .whileConnected)
+return Driver(raw: safeSequence)
 {% endhighlight %}
-
-Output:
-
-```
-
-```
 
 ### Signal
 
