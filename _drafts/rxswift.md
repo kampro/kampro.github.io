@@ -4,7 +4,7 @@ categories: [swift, ios]
 ---
 ## What is Rx?
 
-Rx stands for Reactive Extensions (aka ReactiveX), it is a set of tools which helps to write a code acording to the reactive programming pattern. Using the reactive programming we can write our code in a more declarative way and using Rx library we don't have to think about threads and all the infrastructure.  
+Rx stands for Reactive Extensions (aka ReactiveX), it is a set of tools which helps to write a code according to the reactive programming pattern. Using the reactive programming we can write our code in a more declarative way and using Rx library we don't have to think about threads and all the infrastructure.  
 *RxSwift* is an implementation of Rx in Swift. *RxCocoa* is a library which adds Rx functionality to Cocoa classes and Rx types which can better cooperate with Cocoa. To start with *RxSwift* and *RxCocoa* just add the libraries ([project on GitHub](https://github.com/ReactiveX/RxSwift)) to your project and import them (`import ...`) in the file where you want to use Rx.
 
 ## Observable sequences
@@ -22,7 +22,7 @@ A cold `Observable` doesn't emit events until an observer subscribes to it, is u
 
 ## Subscribing to Observables
 
-It is natural that if something produces events, an other thing wants to listent to them. We can listent to events from `Observable`s using `subscribe(on: (Event<T>) -> Void)` method.
+It is natural that if something produces events, the other thing wants to listen to them. We can listen to events from `Observable`s using `subscribe(on: (Event<T>) -> Void)` method.
 
 {% highlight swift %}
 let sequence = Observable.just("Hello")
@@ -52,7 +52,7 @@ func subscribe(onNext: ((T) -> Void)?, onError: ((Error) -> Void)?, onCompleted:
 
 ## Disposing subscriptions
 
-If you no longer use a subscription you need to dispose it to avoid a memory leak. You can do it manually by calling `dispose()` on the subscription or by adding it to the `DisposeBag`, then, the subscription is disposed automatically when `DisposeBag` is deinitialised.
+If you no longer use a subscription you need to dispose of it to avoid a memory leak. You can do it manually by calling `dispose()` on the subscription or by adding it to the `DisposeBag`, then, the subscription is disposed of automatically when `DisposeBag` is deinitialised.
 
 {% highlight swift %}
 class ViewController: UIViewController {
@@ -88,7 +88,7 @@ It is quite similar to the subscription but it does not register an observer, it
 
 ## Subjects
 
-While an `Observable` has an output only (it can only emit values), an subject is an `Observable` that can add new values to the squence dynamically. *RxSwift* has four kinds of subjects
+While an `Observable` has an output only (it can only emit values), a subject is an `Observable` that can add new values to the sequence dynamically. *RxSwift* has four kinds of subjects
 
 * `BehaviourSubject` - the subject will emit to the observers the most recent element (or an error if it is the last state of the subject) and any other elements emitted later on
 * `PublishSubject` - the subject will emit to the observers every element emitted after the observer subscribed
@@ -167,7 +167,7 @@ Four
 
 ## Traits
 
-Traits are wrapped `Observable`s, they indroduce more contextual meaning and syntactical sugar for specific use cases, they are fully optional and you can do the same thing usign raw `Observable`s (but with more effort). Some Traits have been introduced specifically for *RxCocoa* (i.e. `Driver`). You can always transform the Trait to the `Observable` using `asObservable()` method.
+Traits are wrapped `Observable`s, they introduce more contextual meaning and syntactical sugar for specific use cases, they are fully optional and you can do the same thing using raw `Observable`s (but with more effort). Some Traits have been introduced specifically for *RxCocoa* (i.e. `Driver`). You can always transform the Trait to the `Observable` using `asObservable()` method.
 
 ## RxSwift Traits
 
@@ -318,11 +318,32 @@ return Driver(raw: safeSequence)
 * Can't error out.
 * Delivers events on Main Scheduler.
 * Shares computational resources (share(scope: .whileConnected)).
-* Does NOT replay elements on subscription.
+* Does **not** replay elements on subscription.
 
 ### ControlProperty
 
+`ControlProperty`, as the name suggests, represents a property of a UI element but in the Rx manner. The sequence emits events when an observer subscribes (the initial value) or a **user** changes the value of the property. It doesn't emit events when the property is changed programmatically.
+
+* It never fails
+* `share(replay: 1) behavior`
+  * It's stateful, upon subscription (calling subscribe) last element is immediately replayed if it was produced
+* It will `Complete` sequence on control being deallocated
+* It never errors out
+* It delivers events on `MainScheduler.instance`
+
+Those properties are automatically delivered by *RxCocoa*, i.e. `textField.rx.text`.
+
 ### ControlEvent
+
+This Trait is a sequence that represents an event on a UI element.
+
+* It never fails
+* It won't send any initial value on subscription
+* It will `Complete` sequence on control being deallocated
+* It never errors out
+* It delivers events on `MainScheduler.instance`
+
+For example, it can be `tap` event of `UIButton` - `button.rx.tap`.
 
 ## Operators
 
