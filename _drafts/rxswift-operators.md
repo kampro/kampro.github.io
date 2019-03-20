@@ -181,7 +181,36 @@ Output:
 5
 ```
 
-### first / last
+### take / takeLast
+
+It emits only the first or last *n* items of the sequence.
+
+![take](/assets/rx-take.png)
+
+and
+
+![takelast](/assets/rx-takelast.png)
+
+{% highlight swift %}
+let sequence = Observable.of(1, 2, 3, 4, 5)
+
+sequence.take(1).subscribe(onNext: { value in
+    print(value, terminator: " ")
+}).disposed(by: disposeBag)
+
+print()
+
+sequence.takeLast(2).subscribe(onNext: { value in
+    print(value, terminator: " ")
+}).disposed(by: disposeBag)
+{% endhighlight %}
+
+Output:
+
+```
+1
+4 5
+```
 
 ## Combining
 
@@ -193,8 +222,4 @@ Output:
 
 ## References
 
-[https://github.com/ReactiveX/RxSwift](https://github.com/ReactiveX/RxSwift)  
-[https://github.com/ReactiveX/RxSwift/blob/master/Documentation/GettingStarted.md](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/GettingStarted.md)  
-[http://reactivex.io/documentation/subject.html](http://reactivex.io/documentation/subject.html)  
-[https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md)  
 [http://reactivex.io/documentation/operators.html](http://reactivex.io/documentation/operators.html)

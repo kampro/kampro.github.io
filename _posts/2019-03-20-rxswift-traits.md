@@ -184,3 +184,7 @@ This Trait is a sequence that represents an event on a UI element.
 * It delivers events on `MainScheduler.instance`
 
 For example, it can be `tap` event of `UIButton` - `button.rx.tap`.
+
+## References
+
+[https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/Traits.md)  

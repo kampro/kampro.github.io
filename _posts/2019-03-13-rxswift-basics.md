@@ -164,3 +164,9 @@ Two
 Three
 Four
 ```
+
+## References
+
+[https://github.com/ReactiveX/RxSwift](https://github.com/ReactiveX/RxSwift)  
+[https://github.com/ReactiveX/RxSwift/blob/master/Documentation/GettingStarted.md](https://github.com/ReactiveX/RxSwift/blob/master/Documentation/GettingStarted.md)  
+[http://reactivex.io/documentation/subject.html](http://reactivex.io/documentation/subject.html)  
