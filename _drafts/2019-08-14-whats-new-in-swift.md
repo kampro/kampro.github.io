@@ -227,9 +227,97 @@ struct EightPointedStar {
 
 ## Property wrapper types
 
+## `<` compiler condition
+
+Before Swift 5 we could use `>=` only, when we wanted to mark a code for a specific language or compiler version
+
+{% highlight swift %}
+#if !swift(>=5)
+    // code
+#else
+    // code
+#endif
+
+#if !compiler(>=5)
+    // code
+#else
+    // code
+#endif
+{% endhighlight %}
+
+Now we can use `<` operator
+
+{% highlight swift %}
+#if swift(<5)
+    // code
+#else
+    // code
+#endif
+
+#if compiler(<5)
+    // code
+#else
+    // code
+#endif
+{% endhighlight %}
+
+## Identity key paths
+
+Every value in Swift gets `.self` property, which refers to the value, for example
+
+{% highlight swift %}
+class User {
+    let name: String
+    let password: String
+
+    init(name: String, password: String) {
+        self.name = name
+        self.password = password
+    }
+}
+
+var user = User(name: "John", password: "secret")
+user.self = User(name: "Steve", password: "top secret")
+{% endhighlight %}
+
+now, in Swift 5, we can access the value using a key path
+
+{% highlight swift %}
+// ...
+var user = User(name: "John", password: "secret")
+user[keyPath: \.self] = User(name: "Steve", password: "top secret")
+{% endhighlight %}
+
+## Removing customization points from collections
+
+Before Swift 5 we could overwrite the default behaviour of collections, for example writing an extension for `Array` which gives a logic of `first` property, now this is impossible.
+
+## Flatten nested optionals from `try?`
+
+Using `try?` with a method, which can throw an error, of an optional object produced a double wrapped result
+
+{% highlight swift %}
+class MyClass {
+    func processEvenNumber(_ number: Int) throws -> Int {
+        if number % 2 == 0 {
+            return number
+        } else {
+            throw //...
+        }
+    }
+}
+
+let obj: MyClass? = MyClass()
+let result = try? obj?.processEvenNumber(2)
+// result: Int??
+{% endhighlight %}
+
+in Swift 5 the result will be flattened to `Int?`
+
 ## References
 
 [https://developer.apple.com/videos/play/wwdc2019/402/](https://developer.apple.com/videos/play/wwdc2019/402/)  
 [https://swift.org/blog/utf8-string](https://swift.org/blog/utf8-string)  
 [https://developer.apple.com/documentation/swift/defaultstringinterpolation](https://developer.apple.com/documentation/swift/defaultstringinterpolation)
-[https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html](https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html)
+[https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html](https://docs.swift.org/swift-book/LanguageGuide/OpaqueTypes.html)  
+[https://swift.org/blog/swift-5-released/](https://swift.org/blog/swift-5-released/)
