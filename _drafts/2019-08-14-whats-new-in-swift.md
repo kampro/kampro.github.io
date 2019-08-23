@@ -16,6 +16,16 @@ Table of contents:
 [New design for string interpolation](#head-9)  
 [Opaque result types](#head-10)  
 [Property wrapper types](#head-11)  
+["<" compiler condition](#head-12)  
+[Identity key paths](#head-13)  
+[Removing customization points from collections](#head-14)  
+[Flatten nested optionals from "try?"](#head-15)  
+[Ranges are codable](#head-16)  
+[@dynamicCallable](#head-17)  
+["Never" conforms to "Equatable" and "Hashable"](#head-18)  
+[Standard Library gets "Result" type](#head-19)  
+[@unknown default](#head-20)  
+["compactMapValues" for dictionaries](#head-21)  
 
 ## Shared Swift Runtime {#head-1}
 
@@ -240,7 +250,63 @@ struct EightPointedStar {
 
 ## Property wrapper types {#head-11}
 
-## "<" compiler condition
+Property wrapper types let us reuse a code in a better manner. This solution helps to eliminate repeating a code of, for example, custom property accessors. Property wrappers describe a pattern for accessing properties, let's look at an old-fashioned code presented during WWDC
+
+{% highlight swift %}
+static var usesTouchID: Bool {
+    get {
+        return UserDefaults.standard.bool(forKey: "USES_TOUCH_ID")
+    }
+    set {
+        UserDefaults.standard.set(newValue, forKey: "USES_TOUCH_ID")
+    }
+}
+
+static var isLoggedIn: Bool {
+    get {
+        return UserDefaults.standard.bool(forKey: "LOGGED_IN")
+    }
+    set {
+        UserDefaults.standard.set(newValue, forKey: "LOGGED_IN")
+    }
+}
+{% endhighlight %}
+
+As we can see there is a duplicated code, this is a bad practice. To solve this problem we can use a new `@propertyWrapper` annotation, later on we will be able to mark our properties with a just created custom annotation to apply the accessors. For example
+
+{% highlight swift %}
+@propertyWrapper
+struct UserDefault<T> {
+    let key: String
+    let defaultValue: T
+
+    init(_ key: String, defaultValue: T) {
+        // ...
+        UserDefaults.standard.register(defaults: [key: defaultValue])
+    }
+
+    var value: T {
+        get {
+            return UserDefaults.standard.object(forKey: key) as? T ?? defaultValue
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: key)
+        }
+    }
+}
+{% endhighlight %}
+
+Thanks to `@propertyWrapper` we got `@UserDefault(...)` annotation, now we can change our accessors of UserDefault's values to this code
+
+{% highlight swift %}
+@UserDefault("USES_TOUCH_ID", defaultValue: false)
+static var usesTouchID: Bool
+
+@UserDefault("LOGGED_IN", defaultValue: false)
+static var isLoggedIn: Bool
+{% endhighlight %}
+
+## "<" compiler condition {#head-12}
 
 Before Swift 5 we could use `>=` only, when we wanted to mark a code for a specific language or compiler version
 
@@ -274,7 +340,7 @@ Now we can use `<` operator
 #endif
 {% endhighlight %}
 
-## Identity key paths
+## Identity key paths {#head-13}
 
 Every value in Swift gets `.self` property, which refers to the value, for example
 
@@ -301,11 +367,11 @@ var user = User(name: "John", password: "secret")
 user[keyPath: \.self] = User(name: "Steve", password: "top secret")
 {% endhighlight %}
 
-## Removing customization points from collections
+## Removing customization points from collections {#head-14}
 
 Before Swift 5 we could overwrite the default behaviour of collections, for example writing an extension for `Array` which gives a logic of `first` property, now this is impossible.
 
-## Flatten nested optionals from "try?"
+## Flatten nested optionals from "try?" {#head-15}
 
 Using `try?` with a method, which can throw an error, of an optional object produced a double wrapped result
 
@@ -327,11 +393,11 @@ let result = try? obj?.processEvenNumber(2)
 
 in Swift 5 the result will be flattened to `Int?`
 
-## Ranges are codable
+## Ranges are codable {#head-16}
 
 Rages got conformance to `Codable`, it means that they can be easily used with `JSONEncoder` and `JSONDecoder`.
 
-## @dynamicCallable
+## @dynamicCallable {#head-17}
 
 Swift 5 adds dynamic callable types to better interoperate with languages like Python. To support that feature we need to mark our type with `@dynamicCallable` annotation and we can implement two methods `func dynamicallyCall(withArguments: <#Arguments#>) -> <#R1#>` and `func dynamicallyCall(withKeywordArguments: <#KeywordArguments#>) -> <#R2#>`
 
@@ -353,11 +419,11 @@ dc(1, 2) // c3.dynamicallyCall(withArguments: [1, 2])
 dc(a: 1, 2) // c3.dynamicallyCall(withKeywordArguments: ["a": 1, "": 2])
 {% endhighlight %}
 
-## "Never" conforms to "Equatable" and "Hashable"
+## "Never" conforms to "Equatable" and "Hashable" {#head-18}
 
 `Never` in Swift 5 now can be used as dictionary key.
 
-## Standard Library gets "Result" type
+## Standard Library gets "Result" type {#head-19}
 
 As Swift is improving itself in a server environment, it got `Result` type which is mainly used in asynchronous APIs. Let's see an exaple from Swift's documentation.
 
@@ -390,7 +456,7 @@ URLSession.shared.dataTask(with: url) { (result: Result<(response: URLResponse, 
 }
 {% endhighlight %}
 
-## @unknown default
+## @unknown default {#head-20}
 
 Swift 5 intruduces a new annotation for `default` in `switch`, thanks to it the compiler will warn us if we are using `default` in our `switch` and the `switch` isn't exhaustive. For example, we have a code like below
 
@@ -430,7 +496,7 @@ func process(_ thing: Things) {
 }
 {% endhighlight %}
 
-## "compactMapValues" for dictionaries
+## "compactMapValues" for dictionaries {#head-21}
 
 Without the new `compactMapValues` we need to use `mapValues`, `filter` and `reduce` to get the same result. For example if we wanted to filter out key-value pairs which values can be stored as integers we need to write a code like this
 
