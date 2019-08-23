@@ -2,7 +2,7 @@
 title: "What's new in Swift 5 and 5.1"
 categories: [swift]
 ---
-Apple showed the new things included in Swift 5 and 5.1 language during the last WWDC, the changes are mainly targeted towards the stability, portability and "maturity" of the language.
+Apple showed the new things included in Swift 5 and 5.1 language during the last WWDC, the changes are mainly targeted towards the stability, portability and "maturity" of the language. I described a vast majority of changes, the complete list can be found on [https://swift.org/blog/](https://swift.org/blog/)
 
 Table of contents:  
 [Shared Swift Runtime](#head-1)  
@@ -26,14 +26,19 @@ Table of contents:
 [Standard Library gets "Result" type](#head-19)  
 [@unknown default](#head-20)  
 ["compactMapValues" for dictionaries](#head-21)  
+["Sequence.SubSequence" has been removed](#head-22)  
+[Properties for Unicode scalars](#head-23)  
+[Properties for characters](#head-24)  
+[isMultiple(of:)](#head-25)  
+[*](#head-26)  
 
 ## Shared Swift Runtime {#head-1}
 
-Swift Runtime will be included in operating systems and shared for applications, it means that applications' size will be reduced, because there will be no need to include Swift Runtime to the package, also a launch time overhead will be decreased to 0%.
+Swift Runtime will be included in operating systems and shared for applications, it means that applications' size will be reduced because there will be no need to include Swift Runtime to the package, also a launch time overhead will be decreased to 0%.
 
 ## ABI (application binary interface) and module stability {#head-2}
 
-It means that a way how binaries talk to each other will be normalised, in practice applications, libraries etc. which talk to each other don't need to be compiled with the same compiler, for example: before that change our application compiled with Swift 4 compiler could use libraries compiled with Swift 4 compiler only. Now, applications and libraries compiled with Swift 5 compiler will be able to use (and can be used by) any other library compiled with Swift >=5 compiler.
+It means that the way how binaries talk to each other will be normalised, in practice applications, libraries, etc. which talk to each other don't need to be compiled with the same compiler, for example: before that change our application compiled with Swift 4 compiler could use libraries compiled with Swift 4 compiler only. Now, applications and libraries compiled with Swift 5 compiler will be able to use (and can be used by) any other library compiled with Swift >=5 compiler.
 
 ## Better bridging between Swift and Objective-C {#head-3}
 
@@ -45,9 +50,9 @@ SourceKit, a service responsible for autocompletion, colors and similar code pro
 
 ## Changed encoding from UTF-16 to UTF-8 {#head-5}
 
-Apple decided to ditch UTF-16 in favor of UTF-8, they went to the point where stated that an unification is a much better solution. An interoperability between Swift and Objective-C, design of ABI, text processing etc. is much more efficient with UTF-8.
+Apple decided to ditch UTF-16 in favor of UTF-8, they went to the point where stated that unification is a much better solution. Interoperability between Swift and Objective-C, design of ABI, text processing, etc. is much more efficient with UTF-8.
 
-It works in the similar way like Swift's `Array`'s `map`, it transforms a value emitted by an `Observable` to the new value.
+It works in a similar way like Swift's `Array`'s `map`, it transforms a value emitted by an `Observable` to the new value.
 
 ## Implicit return from single expressions {#head-6}
 
@@ -126,7 +131,7 @@ let lteq = .!gr
 
 ## New design for string interpolation {#head-9}
 
-Format strings are inscure and uncomfortable to use, so we got a new way of string interpolation. Since Swift 5 we have had the ability to customize string interpolation in a modern way, we can extend `DefaultStringInterpolation` or implement `ExpressibleByStringInterpolation`.
+Format strings are insecure and uncomfortable to use, so we got a new way of string interpolation. Since Swift 5 we have had the ability to customize string interpolation in a modern way, we can extend `DefaultStringInterpolation` or implement `ExpressibleByStringInterpolation`.
 
 Using `DefaultStringInterpolation`
 
@@ -149,7 +154,7 @@ print("Username is \(user, uppercased: true)")
 // Username is STEVE
 {% endhighlight %}
 
-The `ExpressibleByStringInterpolation` approach gives us more control and should he used when your case is more complex.
+The `ExpressibleByStringInterpolation` approach gives us more control and should be used when your case is more complex.
 
 {% highlight swift %}
 struct Article {
@@ -193,7 +198,7 @@ This is how SwiftUI's `Text` works, thanks to that we can easily localise our te
 
 ## Opaque result types {#head-10}
 
-Let's see the problem, if we had this code
+Let's see the problem if we had this code
 
 {% highlight swift %}
 protocol Shape { ... }
@@ -203,7 +208,7 @@ struct Union<A: Shape, B: Shape>: Shape { ... }
 struct Transformed<S: Shape >: Shape { ... }
 {% endhighlight %}
 
-we shouldn't create an another type like this one
+we shouldn't create another type like this one
 
 {% highlight swift %}
 struct EightPointedStar {
@@ -213,7 +218,7 @@ struct EightPointedStar {
 }
 {% endhighlight %}
 
-Why? The answer is: because returning a protocol type in such case has a few limitations. It looses the type identity, it doesn't work well with the generic system: we can't use `==` operator because the compiler doesn't know concrete types, returned type can't have any associated types and requirements that involve `Self`. It disables optimisations also.  
+Why? The answer is: because returning a protocol type in such case has a few limitations. It loses the type identity, it doesn't work well with the generic system: we can't use `==` operator because the compiler doesn't know concrete types, returned type can't have any associated types and requirements that involve `Self`. It disables optimisations also.  
 OK, so we could do this
 
 {% highlight swift %}
@@ -250,7 +255,7 @@ struct EightPointedStar {
 
 ## Property wrapper types {#head-11}
 
-Property wrapper types let us reuse a code in a better manner. This solution helps to eliminate repeating a code of, for example, custom property accessors. Property wrappers describe a pattern for accessing properties, let's look at an old-fashioned code presented during WWDC
+Property wrapper types let us reuse code in a better manner. This solution helps to eliminate repeating a code of, for example, custom property accessors. Property wrappers describe a pattern for accessing properties, let's look at an old-fashioned code presented during WWDC
 
 {% highlight swift %}
 static var usesTouchID: Bool {
@@ -272,7 +277,7 @@ static var isLoggedIn: Bool {
 }
 {% endhighlight %}
 
-As we can see there is a duplicated code, this is a bad practice. To solve this problem we can use a new `@propertyWrapper` annotation, later on we will be able to mark our properties with a just created custom annotation to apply the accessors. For example
+As we can see there is a duplicated code, this is a bad practice. To solve this problem we can use a new `@propertyWrapper` annotation, later on, we will be able to mark our properties with a just created custom annotation to apply the accessors. For example
 
 {% highlight swift %}
 @propertyWrapper
@@ -308,7 +313,7 @@ static var isLoggedIn: Bool
 
 ## "<" compiler condition {#head-12}
 
-Before Swift 5 we could use `>=` only, when we wanted to mark a code for a specific language or compiler version
+Before Swift 5 we could use `>=` only, when we wanted to mark code for a specific language or compiler version
 
 {% highlight swift %}
 #if !swift(>=5)
@@ -369,11 +374,11 @@ user[keyPath: \.self] = User(name: "Steve", password: "top secret")
 
 ## Removing customization points from collections {#head-14}
 
-Before Swift 5 we could overwrite the default behaviour of collections, for example writing an extension for `Array` which gives a logic of `first` property, now this is impossible.
+Before Swift 5 we could overwrite the default behavior of collections, for example writing an extension for `Array` which gives a logic of `first` property, now this is impossible.
 
 ## Flatten nested optionals from "try?" {#head-15}
 
-Using `try?` with a method, which can throw an error, of an optional object produced a double wrapped result
+Using `try?` with a method, which can throw an error, of an optional object, produced a double wrapped result
 
 {% highlight swift %}
 class MyClass {
@@ -421,11 +426,11 @@ dc(a: 1, 2) // c3.dynamicallyCall(withKeywordArguments: ["a": 1, "": 2])
 
 ## "Never" conforms to "Equatable" and "Hashable" {#head-18}
 
-`Never` in Swift 5 now can be used as dictionary key.
+`Never` in Swift 5 now can be used as a dictionary key.
 
 ## Standard Library gets "Result" type {#head-19}
 
-As Swift is improving itself in a server environment, it got `Result` type which is mainly used in asynchronous APIs. Let's see an exaple from Swift's documentation.
+As Swift is improving itself in a server environment, it got `Result` type which is mainly used in asynchronous APIs. Let's see an example from Swift's documentation.
 
 {% highlight swift %}
 func dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask
@@ -443,7 +448,7 @@ URLSession.shared.dataTask(with: url) { (data, response, error) in
 }
 {% endhighlight %}
 
-It brought us to the situation where we are checking mutually exclusive cases, if something isn't an error, we shouldn't check its values. `Result` solves this problem and we can keep the code much nicier.
+It brought us to the situation where we are checking mutually exclusive cases, if something isn't an error, we shouldn't check its values. `Result` solves this problem and we can keep the code much nicer.
 
 {% highlight swift %}
 URLSession.shared.dataTask(with: url) { (result: Result<(response: URLResponse, data: Data), Error>) in // Type added for illustration purposes.
@@ -458,7 +463,7 @@ URLSession.shared.dataTask(with: url) { (result: Result<(response: URLResponse, 
 
 ## @unknown default {#head-20}
 
-Swift 5 intruduces a new annotation for `default` in `switch`, thanks to it the compiler will warn us if we are using `default` in our `switch` and the `switch` isn't exhaustive. For example, we have a code like below
+Swift 5 introduces a new annotation for `default` in `switch`, thanks to it the compiler will warn us if we are using `default` in our `switch` and the `switch` isn't exhaustive. For example, we have a code like below
 
 {% highlight swift %}
 enum Things {
@@ -498,7 +503,7 @@ func process(_ thing: Things) {
 
 ## "compactMapValues" for dictionaries {#head-21}
 
-Without the new `compactMapValues` we need to use `mapValues`, `filter` and `reduce` to get the same result. For example if we wanted to filter out key-value pairs which values can be stored as integers we need to write a code like this
+Without the new `compactMapValues` we need to use `mapValues`, `filter` and `reduce` to get the same result. For example, if we wanted to filter out key-value pairs which values can be stored as integers we need to write a code like this
 
 {% highlight swift %}
 let numbers = ["one": "1", "two": "two", "three": "3"]
@@ -513,6 +518,55 @@ Now we can just write
 {% highlight swift %}
 let values = numbers.compactMapValues(Int.init)
 {% endhighlight %}
+
+## "Sequence.SubSequence" has been removed {#head-22}
+
+Before Swift 5, operations which were returning modified versions of sequences, like `dropLast(_:)`, `prefix(_:)`, `sufix(_:)` etc., were returning `SubSequence` type. From Swift 5 the operations return a sequence of concrete type, for example `[Int]`.
+
+## Properties for Unicode scalars {#head-23}
+
+Swift 5 has brought a bunch of properties to Unicode scalars, for example, we can easily check if a scalar is an emoji, whitespace, alphabetic and much more.
+
+{% highlight swift %}
+let text = "\u{FB00} \u{0149}: the date is 01/09/2019"
+var lettersCount = 0
+var title = ""
+text.unicodeScalars.forEach {
+    lettersCount += $0.properties.isAlphabetic ? 1 : 0
+    title.append($0.properties.titlecaseMapping)
+}
+// lettersCount: 11
+// title: Ff ʼN: THE DATE IS 01/09/2019
+{% endhighlight %}
+
+## Properties for characters {#head-24}
+
+Similarly to Unicode scalars, characters got a bunch of properties too. Instead of doing gimmicks we can just use a simple property.
+
+{% highlight swift %}
+let text = "2 is a number"
+let someNumber = "\u{096B}" // ५
+
+if text.first?.isNumber ?? false {
+    print("true")
+}
+
+if let number = someNumber.first?.wholeNumberValue {
+    print(number) // 5
+}
+{% endhighlight %}
+
+## isMultiple(of:) {#head-25}
+
+Now, `BinaryInteger` has a method which allows to easily check if one number is a multiple of another.
+
+{% highlight swift %}
+if 3528495923045.isMultiple(of: 705699184609) {
+    print("true")
+}
+{% endhighlight %}
+
+## ********** {#head-26}
 
 ## References
 
