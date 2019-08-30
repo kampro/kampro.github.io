@@ -30,7 +30,7 @@ Table of contents:
 [Properties for Unicode scalars](#head-23)  
 [Properties for characters](#head-24)  
 [isMultiple(of:)](#head-25)  
-[*](#head-26)  
+[Enhanced String literals delimiters](#head-26)  
 
 ## Shared Swift Runtime {#head-1}
 
@@ -566,7 +566,36 @@ if 3528495923045.isMultiple(of: 705699184609) {
 }
 {% endhighlight %}
 
-## ********** {#head-26}
+## Enhanced String literals delimiters {#head-26}
+
+In Swift 4.2 we could use a standard or multi-line String literal, in both cases, we need to use a backslash `\` if we want to escape special characters like a double quote or backslash itself.
+
+{% highlight swift %}
+let standard = "You need to use a backslash \\ to escape characters. For example: \"The Great Gatsby\" is a very good book."
+
+let multiline = """
+    You need to use a backslash \\ to escape characters.
+    For example: \"The Great Gatsby\" is a very good book.
+    """
+{% endhighlight %}
+
+Swift 5 introduces *raw strings*, if we add a hash `#` symbol at the beginning and end of the string, symbols included in the string will be treated as normal characters and won't be interpreted. If we want to use string interpolation in the raw string, we need to use hash `#` symbol just after a backslash.
+
+{% highlight swift %}
+let book = #""The Great Gatsby""#
+let text = #"""
+    You need to use a backslash \ to escape characters.
+    For example: \#(book) is a very good book.
+    """#
+{% endhighlight %}
+
+What if you want to write `#` inside of a string? You should just embrace the string with a double hash `##`
+
+{% highlight swift %}
+let text = ##"Now we can write # symbol without escaping."##
+{% endhighlight %}
+
+The place where we can appreciate the greatest power of the delimiters is regular expressions.
 
 ## References
 
